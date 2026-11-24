@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>صقر لوحة الشرطة</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@500;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: لوحة عمل للشرطة، هادئة وواضحة، تُقرأ بسرعة
+   IDEA: شاشة غرفة عمليات: رادار يرصد، وبطاقة حكم لكل رابط
+   PICTURE: الرادار في الترويسة، وبطاقة الحكم الكبيرة هي الصورة في كل تبويب
+   COLOUR and TYPE: عنابي شرطة أبوظبي على أبيض وبيج، أحمر للخطر وأخضر للسليم؛ نوتو كوفي للعناوين وتجوّل للنص
+   LAYOUT: ترويسة ثم تبويبات ثم مساحة العمل؛ عمودان على الشاشة العريضة وعمود واحد على الهاتف */
+:root{color-scheme:light;
+--bg:#F6F1EA;--panel:#FFFFFF;--ink:#1F1512;--body:#4E3F38;
+--mute:#7A6A62;--line:#E3D6C6;--brand:#7A2E2E;--brandFill:#7A2E2E;--tint:#F3E8DA;
+--red:#C8431F;--redT:#FBE9E3;--amber:#A66300;--amberT:#FFF1DB;
+--green:#2E8B74;--greenT:#E3F2EE}
+
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 Tajawal,Tahoma,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:'Noto Kufi Arabic',Tahoma,sans-serif;line-height:1.3;margin:0}
+header{background:var(--brandFill);color:#fff;padding:20px max(4vw,16px);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header h1{font-size:clamp(26px,4vw,36px);font-weight:800}
+header p{margin:0;color:#F3E2D6;font-size:15px}
+.radar{width:72px;height:72px;flex:none}
+.sweep{transform-origin:50px 50px;animation:spin 4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.sweep{animation:none}}
+.tag{margin-inline-start:auto;flex:none;background:rgba(255,255,255,.16);border-radius:30px;padding:4px 14px;font-size:14px;white-space:nowrap}
+nav{display:flex;gap:6px;flex-wrap:wrap;padding:12px max(4vw,16px);background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+nav button{font:700 16px Tajawal,sans-serif;min-height:44px;padding:0 18px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+nav button[aria-selected=true]{background:var(--brandFill);color:#fff;border-color:var(--brandFill)}
+main{padding:24px max(4vw,16px) 60px;max-width:1240px;margin:auto}
+.grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:22px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.tag{display:none}.radar{width:56px;height:56px}nav button{font-size:15px;padding:0 12px;flex:1 1 auto}main{padding:16px 12px 48px}.card{padding:16px}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px}
+.card h2{font-size:21px;margin-bottom:12px}
+label{display:block;font-weight:700;margin:12px 0 6px}
+input,textarea,select{width:100%;font:16px Tajawal,sans-serif;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+input,.ltr{direction:ltr;text-align:left}
+textarea{min-height:130px;resize:vertical}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.btn{font:700 16px Tajawal,sans-serif;min-height:46px;padding:0 20px;border-radius:12px;border:0;background:var(--brandFill);color:#fff;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--brand);border:1px solid var(--brand)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.hint{color:var(--mute);font-size:14px;margin:8px 0 0}
+.verdict{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.score{font:800 clamp(54px,9vw,84px)/1 'Noto Kufi Arabic',sans-serif}
+.score small{font-size:24px;color:var(--mute)}
+.pill{display:inline-block;padding:5px 14px;border-radius:30px;font-weight:700;font-size:15px;white-space:nowrap}
+.high{color:var(--red)}.pill.high{background:var(--redT)}
+.medium{color:var(--amber)}.pill.medium{background:var(--amberT)}
+.low,.safe{color:var(--green)}.pill.low,.pill.safe{background:var(--greenT)}
+.meter{height:12px;border-radius:8px;background:var(--tint);overflow:hidden;margin:14px 0 6px}
+.meter i{display:block;height:100%;border-radius:8px;transition:width .5s}
+.final{font-size:15px;color:var(--body);word-break:break-all;direction:ltr;text-align:left}
+ul.reasons{list-style:none;padding:0;margin:8px 0 0}
+ul.reasons li{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+ul.reasons b{flex:none;color:var(--brand);font-size:14px;min-width:3.5em}
+.layer{color:var(--mute);font-size:13px;display:block}
+.money{background:var(--tint);border-radius:14px;padding:14px;margin-top:14px}
+.money code{direction:ltr;display:inline-block;font-size:15px}
+.empty{color:var(--mute);text-align:center;padding:40px 10px}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:right;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:700;font-size:14px}
+td.u{direction:ltr;text-align:left;word-break:break-all}
+.num{text-align:center;white-space:nowrap}
+.cluster{border:2px solid var(--red);border-radius:14px;padding:14px;margin-top:12px}
+.note{font-size:14px;color:var(--mute);border-top:1px dashed var(--line);margin-top:16px;padding-top:10px}
+.toast{position:fixed;bottom:18px;inset-inline:0;margin:auto;width:max-content;max-width:90vw;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:12px;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.on{opacity:1}
+[hidden]{display:none!important}
+@media(max-width:600px){table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:7em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:6.5em;margin-inline-start:-7em;color:var(--mute)}.stack td:empty{display:none}}
+</style>
+</head>
+<body>
+<header>
+<svg class="radar" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="none" stroke="#F3E2D6" stroke-opacity=".5" stroke-width="2"/><circle cx="50" cy="50" r="30" fill="none" stroke="#F3E2D6" stroke-opacity=".35" stroke-width="2"/><circle cx="50" cy="50" r="14" fill="none" stroke="#F3E2D6" stroke-opacity=".3" stroke-width="2"/><g class="sweep"><path d="M50 50L50 4A46 46 0 0 1 82.5 17.5Z" fill="#F3E2D6" fill-opacity=".35"/><line x1="50" y1="50" x2="82.5" y2="17.5" stroke="#fff" stroke-width="2"/></g><circle cx="70" cy="30" r="4" fill="#FF8A65"/><circle cx="28" cy="64" r="4" fill="#FF8A65"/><circle cx="50" cy="50" r="5" fill="#fff"/></svg>
+<div><h1>صقر</h1><p>لوحة الشرطة لكشف روابط الاحتيال وتتبّع أموالها</p></div>
+<span class="tag">نموذج أولي · AD team</span>
+</header>
+<nav role="tablist">
+<button role="tab" aria-selected="true" data-t="scan">فحص رابط</button>
+<button role="tab" aria-selected="false" data-t="sms">الرسائل النصية</button>
+<button role="tab" aria-selected="false" data-t="early">الرصد المبكر</button>
+<button role="tab" aria-selected="false" data-t="net">شبكات الاحتيال والبنوك</button>
+</nav>
+<main>
+<section id="scan" class="grid">
+<div class="card">
+<h2>افحص رابطاً</h2>
+<label for="url">الرابط</label>
+<input id="url" placeholder="https://..." autocomplete="off">
+<label for="page">محتوى الصفحة (اختياري، لتحليل المحتوى وتتبّع المال)</label>
+<textarea id="page" placeholder="الصق نص الصفحة أو كودها هنا"></textarea>
+<div class="row"><button class="btn" id="go">افحص</button><button class="btn ghost" id="ex1">مثال احتيال</button><button class="btn ghost" id="ex2">مثال رسمي</button></div>
+<p class="hint">جرّبوا: uaepas.ae/verify أو adcb-secure-login.xyz أو tamm.abudhabi</p>
+</div>
+<div class="card" id="result"><p class="empty">النتيجة تظهر هنا: درجة خطر من 100 مع أسبابها</p></div>
+</section>
+
+<section id="sms" hidden>
+<div class="card">
+<h2>محاكاة جدار حماية الرسائل لدى شركة الاتصالات</h2>
+<p class="hint" style="margin-top:0">النظام يستخرج الرابط فقط من كل رسالة، دون نصها أو بيانات المرسل، ثم يقرر: حجب أو تحذير أو تمرير.</p>
+<label for="msgs">رسائل واردة (رسالة في كل سطر)</label>
+<textarea id="msgs" style="min-height:190px"></textarea>
+<div class="row"><button class="btn" id="runsms">مرّر الرسائل عبر صقر</button></div>
+<div id="smsout" style="margin-top:16px"></div>
+</div>
+</section>
+
+<section id="early" hidden>
+<div class="card">
+<h2>الرصد المبكر: الأسماء المشابهة للجهات الإماراتية</h2>
+<p class="hint" style="margin-top:0">يولّد صقر التحريفات المحتملة لاسم الجهة (حذف حرف، تبديل، أحرف متشابهة، إضافة كلمات مثل pay وlogin، امتدادات أخرى) ويقيّم كل اسم قبل أن يستخدمه المحتالون.</p>
+<label for="brand">الجهة</label>
+<select id="brand"></select>
+<div class="row"><button class="btn" id="rungen">ولّد وقيّم</button></div>
+<div id="earlyout" style="margin-top:16px"></div>
+<p class="note">في نسخة الخادم (الكود على GitHub) يتحقق صقر أيضاً أي هذه الأسماء مسجّل فعلاً، ويراقب سجلات شهادات SSL الجديدة لحظياً.</p>
+</div>
+</section>
+
+<section id="net" hidden>
+<div class="grid">
+<div class="card">
+<h2>شبكات الاحتيال</h2>
+<p class="hint" style="margin-top:0">المواقع التي تشترك في حساب بنكي أو رقم هاتف أو محفظة = غالباً نفس العصابة.</p>
+<div class="row"><button class="btn" id="loaddemo">حمّل ثلاث صفحات احتيال تجريبية</button></div>
+<div id="clusters"></div>
+</div>
+<div class="card">
+<h2>قائمة الحسابات للبنوك</h2>
+<p class="hint" style="margin-top:0">حسابات IBAN من مواقع عالية الخطورة، لتجميدها وتعليق أي تحويل إليها.</p>
+<div id="freeze"></div>
+</div>
+</div>
+</section>
+<p class="hint" style="text-align:center;margin-top:28px">نموذج أولي يعمل داخل المتصفح: تحليل العنوان والمحتوى الملصق. فتح المواقع، وبيانات WHOIS، ولقطات الشاشة تعمل في نسخة الخادم. الأمثلة مخترعة للتجربة.</p>
+</main>
+<div class="toast" id="toast" role="status"></div>
+<script>
+{
+const BRANDS=[
+['adpolice','شرطة أبوظبي',['adpolice.gov.ae'],['adpolice','adpolic','abudhabipolice','ad-police','شرطة أبوظبي']],
+['dubaipolice','شرطة دبي',['dubaipolice.gov.ae'],['dubaipolice','dubai-police','شرطة دبي']],
+['uaepass','الهوية الرقمية UAE PASS',['uaepass.ae'],['uaepass','uae-pass','uaepas','الهوية الرقمية']],
+['tamm','تطبيق تم',['tamm.abudhabi','abudhabi.gov.ae'],['tamm']],
+['icp','الهيئة الاتحادية للهوية والجنسية',['icp.gov.ae'],['icp-uae','icpuae','emiratesid','emirates-id']],
+['rta','هيئة الطرق والمواصلات',['rta.ae'],['rta-dubai','rtadubai','rta-fines']],
+['salik','سالك',['salik.ae'],['salik','سالك']],
+['fines','سداد المخالفات المرورية',[],['mukhalafat','traffic-fine','trafficfine','uaefines','pay-fine','المخالفات المرورية']],
+['adcb','بنك أبوظبي التجاري',['adcb.com'],['adcb']],
+['fab','بنك أبوظبي الأول',['bankfab.com'],['bankfab','fab-bank','fabbank']],
+['enbd','بنك الإمارات دبي الوطني',['emiratesnbd.com'],['emiratesnbd','emirates-nbd','enbd']],
+['adib','مصرف أبوظبي الإسلامي',['adib.ae'],['adib']],
+['dib','بنك دبي الإسلامي',['dib.ae'],['dubaiislamic','dib-bank']],
+['mashreq','بنك المشرق',['mashreq.com'],['mashreq']],
+['etisalat','اتصالات e&',['etisalat.ae','eand.com'],['etisalat','اتصالات']],
+['du','دو',['du.ae'],['du-telecom','dutelecom']],
+['emiratespost','بريد الإمارات',['emiratespost.ae'],['emiratespost','emirates-post']],
+['aramex','أرامكس',['aramex.com'],['aramex']]
+].map(([id,name,official,kw])=>({id,name,official,kw}));
+const SAFE=['google.com','youtube.com','facebook.com','instagram.com','whatsapp.com','x.com','microsoft.com','apple.com','amazon.ae','noon.com','wikipedia.org','github.com'];
+const SHORT=['bit.ly','tinyurl.com','t.co','goo.gl','is.gd','cutt.ly','rb.gy','shorturl.at','t.ly','tiny.cc'];
+const RISKY=['xyz','top','icu','shop','click','live','online','site','buzz','cfd','sbs','rest','vip','info','support','help','win','loan','pw','tk'];
+const SUS=['login','signin','verify','verification','update','secure','security','account','confirm','pay','payment','fine','fines','refund','reward','bonus','gift','wallet','otp','suspend','blocked','billing','delivery','parcel','customs','tracking','kyc','auth','renew','claim'];
+const MULTI=['gov.ae','ac.ae','co.ae','net.ae','org.ae','co.uk','com.sa','com.eg','com.qa'];
+const URG=['خلال 24 ساعة','فوراً','تم إيقاف','سيتم إيقاف','تم تعليق','سيتم تعليق','حسابك موقوف','تحديث بياناتك','مخالفة غير مدفوعة','غرامة','آخر فرصة','استرداد','جائزة','مبروك','شحنتك معلقة','رسوم جمركية','رمز التحقق','تأكيد هويتك','within 24 hours','suspended','verify your account','unpaid fine','refund','congratulations','customs fee'];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);
+
+function norm(u){u=(u||'').trim().replace(/^hxxp/i,'http').replace(/\[\.\]/g,'.');if(!/^https?:\/\//i.test(u))u='http://'+u;return u}
+function parse(u){try{return new URL(norm(u))}catch(e){return null}}
+function split(h){if(/^\d+\.\d+\.\d+\.\d+$/.test(h))return['',h,''];const L=h.split('.');if(L.length<2)return['',h,''];const l2=L.slice(-2).join('.');
+ if(MULTI.includes(l2)&&L.length>=3)return[L.slice(0,-3).join('.'),L.at(-3),l2];return[L.slice(0,-2).join('.'),L.at(-2),L.at(-1)]}
+const reg=h=>{const[,s,x]=split(h);return x?s+'.'+x:s};
+function lev(a,b){const m=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){let p=m[0];m[0]=i;for(let j=1;j<=b.length;j++){const t=m[j];m[j]=Math.min(m[j]+1,m[j-1]+1,p+(a[i-1]!==b[j-1]));p=t}}return m[b.length]}
+const deg=s=>s.toLowerCase().replace(/rn/g,'m').replace(/vv/g,'w').replace(/[013457 8@$]/g,c=>({0:'o',1:'l',3:'e',4:'a',5:'s',7:'t',8:'b','@':'a','$':'s'}[c]||c));
+function whitelist(h){for(const b of BRANDS)for(const o of b.official)if(h===o||h.endsWith('.'+o))return b.name;if(SAFE.includes(reg(h)))return'موقع عالمي معروف';if(h.endsWith('.gov.ae'))return'جهة حكومية إماراتية';return null}
+function similar(h){const[,sld]=split(h);const flat=h.replace(/[.-]/g,''),labels=h.replace(/-/g,'.').split('.'),out=[];
+ for(const b of BRANDS){for(const k0 of b.kw){if(/[^\x00-\x7F]/.test(k0))continue;const k=k0.replace(/-/g,'');
+   if((k.length>=4&&(flat.includes(k)||deg(flat).includes(deg(k))))||(k.length<4&&labels.includes(k))){out.push([b,'kw']);break}}
+  for(const o of b.official){const os=split(o)[1];if(os.length<4)continue;for(const c of new Set([sld,deg(sld),sld.replace(/-/g,'')])){const d=lev(c,os);
+   if(d>0&&d<=(os.length<=5?1:2)){out.push([b,'typo',o]);break}if(c===os&&reg(h)!==o){out.push([b,'tld',o]);break}}}}
+ const seen=new Set();return out.filter(([b,k])=>{const key=b.id+k;if(seen.has(key))return false;seen.add(key);return true})}
+function validIban(s){s=s.replace(/[\s-]/g,'').toUpperCase();if(!/^AE\d{21}$/.test(s))return false;const r=(s.slice(4)+s.slice(0,4)).replace(/[A-Z]/g,c=>c.charCodeAt(0)-55);return BigInt(r)%97n===1n}
+function money(t){t=(t||'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+ const ibans=[...new Set((t.match(/\bAE\s?\d{2}(?:[\s-]?\d){19}\b/gi)||[]).filter(validIban).map(x=>x.replace(/[\s-]/g,'').toUpperCase()))];
+ const ph=new Set();(t.match(/(?:\+971|00971|\b0)[\s-]?(?:5\d|[2-79])(?:[\s-]?\d){7}(?!\d)/g)||[]).forEach(p=>{let d=p.replace(/\D/g,'').replace(/^00971|^971|^0/,'');ph.add('+971'+d)});
+ (t.match(/wa\.me\/\+?(\d{9,15})/gi)||[]).forEach(p=>ph.add('+'+p.replace(/\D/g,'')));
+ const wallets=[...new Set([...(t.match(/\b0x[a-fA-F0-9]{40}\b/g)||[]),...(t.match(/\bT[1-9A-HJ-NP-Za-km-z]{33}\b/g)||[])])];
+ return{ibans,phones:[...ph],wallets}}
+
+function scan(input,page='',source='يدوي'){
+ const U=parse(input);if(!U)return null;const h=U.hostname.toLowerCase(),R=[];const add=(p,t,l)=>R.push({p,t,l});
+ const res={id:Math.random().toString(36).slice(2,9),url:U.href,host:h,domain:reg(h),source,time:new Date().toISOString().slice(0,19).replace('T',' ')};
+ const wl=whitelist(h);if(wl)return{...res,score:0,level:'safe',levelAr:'موقع رسمي / موثوق',reasons:[{p:0,t:'نطاق موثوق ضمن القائمة البيضاء ('+wl+')',l:'القائمة البيضاء'}],imp:[],money:{ibans:[],phones:[],wallets:[]}};
+ const[sub,sld,suf]=split(h),low=U.href.toLowerCase(),words=low.replace(/[-_./?=&:]/g,' ');
+ const sus=SUS.filter(w=>new RegExp('(^|[^a-z])'+w+'([^a-z]|$)').test(words));const sims=similar(h),imp=[];
+ if(SHORT.includes(reg(h)))add(5,'رابط مختصر يخفي العنوان الحقيقي (يُفك في نسخة الخادم)','تحليل العنوان');
+ for(const[b,k,o]of sims){if(!imp.includes(b))imp.push(b);
+  if(k==='kw')add(35,'يستخدم اسم «'+b.name+'» في نطاق غير رسمي','تحليل العنوان');
+  else if(k==='typo')add(35,'اسم النطاق قريب جداً من النطاق الرسمي '+o+' (تحريف مقصود)','تحليل العنوان');
+  else add(30,'نفس اسم '+o+' لكن بامتداد مختلف','تحليل العنوان')}
+ const risky=suf&&RISKY.includes(suf.split('.').at(-1));
+ if(imp.length&&(sus.length||risky))add(10,'انتحال جهة إماراتية مع كلمات دفع أو تحقق: نمط احتيال معروف','تحليل العنوان');
+ if(/^\d+\.\d+\.\d+\.\d+$/.test(h))add(20,'الرابط يستخدم عنوان IP بدل اسم نطاق','تحليل العنوان');
+ if(h.includes('xn--'))add(20,'النطاق يستخدم أحرفاً مشابهة من لغات أخرى (Punycode)','تحليل العنوان');
+ if(risky)add(10,'امتداد نطاق يكثر استخدامه في الاحتيال (.'+suf.split('.').at(-1)+')','تحليل العنوان');
+ if(sus.length)add(Math.min(16,8*sus.length),'كلمات احتيال شائعة في الرابط: '+sus.slice(0,4).join('، '),'تحليل العنوان');
+ if(sub.split('.').filter(Boolean).length>=3||(h.match(/-/g)||[]).length>=3)add(5,'بنية نطاق معقدة (نطاقات فرعية أو شرطات كثيرة)','تحليل العنوان');
+ if(U.href.includes('@'))add(10,'الرابط يحتوي @ لإخفاء الوجهة الحقيقية','تحليل العنوان');
+ let m={ibans:[],phones:[],wallets:[]};
+ if(page.trim()){const txt=page.replace(/<[^>]+>/g,' '),lowp=page.toLowerCase();
+  const pb=BRANDS.filter(b=>[b.name,...b.kw.filter(k=>k.length>=5)].some(n=>lowp.includes(n.toLowerCase())));
+  const asks=[];if(/type=["']?password|كلمة المرور|password/i.test(page))asks.push('كلمة المرور');if(/card|cvv|cvc|رقم البطاقة|تاريخ الانتهاء/i.test(page))asks.push('بيانات البطاقة');
+  if(/otp|رمز التحقق|verification code/i.test(page))asks.push('رمز التحقق');if(/emirates.?id|رقم الهوية/i.test(page))asks.push('رقم الهوية');
+  if(asks.length)add(pb.length?25:10,(pb.length?'صفحة تذكر «'+pb[0].name+'» وتطلب: ':'الصفحة تطلب: ')+asks.join('، '),'قراءة المحتوى');
+  else if(pb.length)add(10,'الصفحة تذكر «'+pb[0].name+'» من نطاق غير رسمي','قراءة المحتوى');
+  pb.forEach(b=>{if(!imp.includes(b))imp.push(b)});
+  const form=page.match(/action=["']https?:\/\/([^/"']+)/i);if(form&&reg(form[1].toLowerCase())!==reg(h))add(15,'النموذج يرسل البيانات إلى نطاق مختلف: '+form[1],'قراءة المحتوى');
+  const u=URG.filter(x=>lowp.includes(x.toLowerCase()));if(u.length)add(10,'عبارات استعجال وتهديد: '+u.slice(0,3).join('، '),'قراءة المحتوى');
+  m=money(page+' '+txt);const parts=[];if(m.ibans.length)parts.push(m.ibans.length+' حساب IBAN');if(m.phones.length)parts.push(m.phones.length+' رقم هاتف');if(m.wallets.length)parts.push(m.wallets.length+' محفظة رقمية');
+  if(parts.length)add(5,'استُخرج من الصفحة: '+parts.join('، '),'تتبّع المال')}
+ const score=Math.min(100,R.reduce((a,r)=>a+r.p,0));const level=score>=70?'high':score>=40?'medium':'low';
+ return{...res,score,level,levelAr:{high:'خطورة عالية',medium:'مشبوه',low:'خطورة منخفضة'}[level],reasons:R.sort((a,b)=>b.p-a.p),imp:imp.map(b=>b.name),money:m}}
+
+const LOG=[];
+const col=l=>({high:'var(--red)',medium:'var(--amber)',low:'var(--green)',safe:'var(--green)'}[l]);
+function evidence(r){return['صقر — تقرير أدلة','رقم الفحص: '+r.id,'الوقت: '+r.time,'المصدر: '+r.source,'الرابط: '+r.url,'النطاق المسجَّل: '+r.domain,'الدرجة: '+r.score+'/100 — '+r.levelAr,'الجهة المنتحَلة: '+(r.imp.join('، ')||'—'),'','أسباب الحكم:',...r.reasons.map(x=>'- (+'+x.p+') ['+x.l+'] '+x.t),'','تتبّع المال:','IBAN: '+(r.money.ibans.join(', ')||'—'),'هواتف: '+(r.money.phones.join(', ')||'—'),'محافظ: '+(r.money.wallets.join(', ')||'—')].join('\n')}
+function takedown(r){return`Subject: Urgent takedown request – phishing site impersonating a UAE entity – ${r.domain}\n\nDear Abuse Team,\n\nWe are reporting an active phishing website targeting residents of the United Arab Emirates.\n\n  Domain: ${r.domain}\n  URL: ${r.url}\n  Detected: ${r.time}\n  Risk score: ${r.score}/100\n\nPlease suspend this domain/hosting and preserve related logs for a possible law-enforcement request.\n\nReference: SAQR-${r.id}`}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1800)}
+async function copy(t){try{await navigator.clipboard.writeText(t);toast('تم النسخ')}catch(e){toast('تعذّر النسخ في هذا المتصفح')}}
+
+function show(r){const box=$('result');if(!r){box.innerHTML='<p class="empty">الرابط غير صالح</p>';return}
+ const mm=r.money,hasM=mm.ibans.length||mm.phones.length||mm.wallets.length;
+ box.innerHTML=`<div class="verdict"><div class="score ${r.level}">${r.score}<small>/100</small></div><div><span class="pill ${r.level}">${esc(r.levelAr)}</span>${r.imp.length?'<p style="margin:8px 0 0">الجهة المنتحَلة: <b>'+esc(r.imp.join('، '))+'</b></p>':''}</div></div>
+ <div class="meter"><i style="width:${Math.max(r.score,3)}%;background:${col(r.level)}"></i></div><p class="final">${esc(r.url)}</p>
+ <h3 style="font-size:18px;margin-top:14px">أسباب الحكم</h3><ul class="reasons">${r.reasons.map(x=>`<li><b>+${x.p}</b><span>${esc(x.t)}<span class="layer">${esc(x.l)}</span></span></li>`).join('')||'<li>لا توجد مؤشرات خطر في العنوان</li>'}</ul>
+ ${hasM?`<div class="money"><b>تتبّع المال</b>${mm.ibans.map(x=>'<div>IBAN: <code>'+esc(x)+'</code></div>').join('')}${mm.phones.map(x=>'<div>هاتف: <code>'+esc(x)+'</code></div>').join('')}${mm.wallets.map(x=>'<div>محفظة: <code>'+esc(x)+'</code></div>').join('')}</div>`:''}
+ ${r.score>=40?'<div class="row"><button class="btn" data-c="ev">نسخ تقرير الأدلة</button><button class="btn ghost" data-c="td">نسخ طلب الإزالة</button></div>':''}`;
+ box.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>copy(b.dataset.c==='ev'?evidence(r):takedown(r)))}
+
+const EX_PAGE=`<title>شرطة أبوظبي - سداد المخالفات</title><h1>شرطة أبوظبي</h1><p>لديك مخالفة غير مدفوعة 400 درهم. ادفع خلال 24 ساعة لتجنب الغرامة.</p>
+<form action="https://collect-data.top/x.php"><label>رقم البطاقة</label><input name="cardnumber"><input name="cvv"><input type="password" name="pin"></form>
+<p>للتحويل البنكي: AE07 0331 2345 6789 0123 456 أو واتساب wa.me/971501234567</p>`;
+$('go').onclick=()=>{const r=scan($('url').value,$('page').value);if(r)LOG.push(r);show(r)};
+$('url').addEventListener('keydown',e=>{if(e.key==='Enter')$('go').click()});
+$('ex1').onclick=()=>{$('url').value='http://adpolice-fines-pay.com/ae';$('page').value=EX_PAGE;$('go').click()};
+$('ex2').onclick=()=>{$('url').value='https://tamm.abudhabi/services';$('page').value='';$('go').click()};
+
+$('msgs').value=['شرطة أبوظبي: لديك مخالفة مرورية غير مدفوعة بقيمة 400 درهم. ادفعها خلال 24 ساعة: adpolice-fines-pay.com/ae','عزيزي العميل، تم تعليق بطاقتك من ADCB. يرجى تحديث بياناتك: https://adcb-secure-verify.xyz/login','UAE PASS: Your account will be suspended. Verify now: http://uaepas.ae/verify','بريد الإمارات: شحنتك معلقة بسبب رسوم جمركية 12 درهم. ادفع هنا https://emiratespost-delivery.top/track','سالك: رصيدك منخفض، أعد الشحن الآن salik-topup.online/pay','Emirates NBD: Unusual login detected. Confirm: https://emiratesnbd.net/update','تذكير من TAMM: موعدك غداً. التفاصيل: https://tamm.abudhabi/services','رابط اجتماع الغد https://www.google.com/calendar'].join('\n');
+const URLRE=/(?:https?:\/\/|www\.)\S+|\b[a-z0-9][a-z0-9-]{1,62}(?:\.[a-z0-9-]{2,63})*\.(?:com|net|org|info|xyz|top|online|site|shop|live|ae|abudhabi|co|me|app|vip|link|click|icu)\b(?:\/\S*)?/gi;
+$('runsms').onclick=()=>{const rows=[];$('msgs').value.split('\n').filter(l=>l.trim()).forEach(msg=>{(msg.match(URLRE)||[]).forEach(u=>{u=u.replace(/[.,،)]+$/,'');const r=scan(u,'','رسالة نصية');if(!r)return;LOG.push(r);
+ const a=r.score>=70?['حجب + إرسال للشرطة','high']:r.score>=40?['تحذير المستلم','medium']:['تمرير','low'];rows.push({r,a})})});
+ $('smsout').innerHTML=`<table class="stack"><thead><tr><th>الإجراء</th><th class="num">الدرجة</th><th>الجهة المنتحلة</th><th>الرابط</th></tr></thead><tbody>${rows.map(({r,a})=>`<tr><td><span class="pill ${a[1]}">${a[0]}</span></td><td class="num ${r.level}"><b>${r.score}</b></td><td>${esc(r.imp.join('، ')||'—')}</td><td class="u">${esc(r.host+new URL(r.url).pathname)}</td></tr>`).join('')}</tbody></table>`};
+
+$('brand').innerHTML=BRANDS.filter(b=>b.official.length).map(b=>`<option value="${b.id}">${esc(b.name)} — ${esc(b.official[0])}</option>`).join('');
+const KEY={q:'wa',w:'qes',e:'wrd',r:'etf',t:'ryg',y:'tuh',u:'yij',i:'uok',o:'ipl',p:'o',a:'qsz',s:'awdz',d:'sefx',f:'drgc',g:'fthv',h:'gyjb',j:'hukn',k:'jilm',l:'ko',z:'asx',x:'zsdc',c:'xdfv',v:'cfgb',b:'vghn',n:'bhjm',m:'njk'};
+const GL={o:'0',l:'1',i:'1',e:'3',a:'4',s:'5',b:'8',m:'rn',w:'vv'};
+function variants(n){const o=new Set();for(let i=0;i<n.length;i++){o.add(n.slice(0,i)+n.slice(i+1));o.add(n.slice(0,i)+n[i]+n.slice(i));
+ if(i<n.length-1)o.add(n.slice(0,i)+n[i+1]+n[i]+n.slice(i+2));for(const k of KEY[n[i]]||'')o.add(n.slice(0,i)+k+n.slice(i+1));if(GL[n[i]])o.add(n.slice(0,i)+GL[n[i]]+n.slice(i+1))}
+ for(const w of['pay','secure','login','online','uae','verify','update','fines','refund'])[n+'-'+w,w+'-'+n,n+w].forEach(x=>o.add(x));o.delete(n);return[...o].filter(x=>x.length>=3)}
+$('rungen').onclick=()=>{const b=BRANDS.find(x=>x.id===$('brand').value),off=b.official[0],sld=split(off)[1];const tl=['com','net','ae','xyz','top','online'];
+ const all=[];variants(sld).forEach(v=>tl.forEach(t=>{const d=v+'.'+t;if(d!==off)all.push(scan(d,'','الرصد المبكر'))}));
+ const top=all.filter(Boolean).sort((a,b)=>b.score-a.score);const hi=top.filter(r=>r.score>=40);
+ $('earlyout').innerHTML=`<p>ولّد صقر <b>${all.length}</b> اسماً مشابهاً لـ <span class="ltr" style="display:inline">${esc(off)}</span>، منها <b class="high">${hi.length}</b> عالية أو متوسطة الخطورة. أعلى 25:</p>
+ <table class="stack"><thead><tr><th>النطاق المحتمل</th><th class="num">الدرجة</th><th>السبب الأقوى</th></tr></thead><tbody>${top.slice(0,25).map(r=>`<tr><td class="u">${esc(r.host)}</td><td class="num ${r.level}"><b>${r.score}</b></td><td>${esc(r.reasons[0]?.t||'—')}</td></tr>`).join('')}</tbody></table>`};
+
+const DEMO=[['http://adpolice-pay.com/fines','شرطة أبوظبي: سداد المخالفات. ادفع خلال 24 ساعة. رقم البطاقة <input name=cvv> حوّل إلى AE07 0331 2345 6789 0123 456 أو واتساب wa.me/971501234567'],
+ ['https://salik-topup.online/pay','سالك: أعد شحن رصيدك فوراً. رقم البطاقة <input name=card>. التحويل إلى AE07 0331 2345 6789 0123 456'],
+ ['https://rta-fines.top/','هيئة الطرق: مخالفة غير مدفوعة. للاستفسار واتساب wa.me/971501234567 أو USDT TQrY8tryqsYVCYS3MFbtffiPp2ccyn4STm']];
+function renderNet(){const hi=LOG.filter(r=>r.score>=40&&(r.money.ibans.length||r.money.phones.length||r.money.wallets.length));
+ const parent={},find=x=>parent[x]===x?x:(parent[x]=find(parent[x])),uni=(a,b)=>{parent[a]??=a;parent[b]??=b;parent[find(a)]=find(b)};
+ hi.forEach(r=>{const s='s:'+r.domain;parent[s]??=s;[...r.money.ibans,...r.money.phones,...r.money.wallets].forEach(k=>uni(s,'k:'+k))});
+ const groups={};Object.keys(parent).forEach(n=>{(groups[find(n)]??=[]).push(n)});
+ const cl=Object.values(groups).map(g=>({sites:[...new Set(g.filter(n=>n.startsWith('s:')).map(n=>n.slice(2)))],keys:g.filter(n=>n.startsWith('k:')).map(n=>n.slice(2))})).filter(c=>c.sites.length>=2);
+ $('clusters').innerHTML=cl.length?cl.map((c,i)=>`<div class="cluster"><b class="high">شبكة ${i+1}: ${c.sites.length} مواقع</b><p class="final" style="margin:6px 0">${c.sites.map(esc).join('<br>')}</p><p style="margin:0">المؤشرات المشتركة:</p><p class="final" style="margin:0">${c.keys.map(esc).join('<br>')}</p></div>`).join(''):'<p class="empty">لم تُكتشف شبكات بعد. تظهر عندما يشترك موقعان أو أكثر في حساب أو رقم أو محفظة.</p>';
+ const acc={};LOG.filter(r=>r.score>=70).forEach(r=>r.money.ibans.forEach(i=>{(acc[i]??={iban:i,sites:new Set(),max:0}).sites.add(r.domain);acc[i].max=Math.max(acc[i].max,r.score)}));
+ const L=Object.values(acc);
+ $('freeze').innerHTML=L.length?`<table class="stack"><thead><tr><th>IBAN</th><th class="num">أعلى درجة</th><th>المواقع</th></tr></thead><tbody>${L.map(a=>`<tr><td class="u">${esc(a.iban)}</td><td class="num high"><b>${a.max}</b></td><td class="u">${[...a.sites].map(esc).join('<br>')}</td></tr>`).join('')}</tbody></table><div class="row"><button class="btn" id="cpf">نسخ القائمة للبنوك (CSV)</button></div>`:'<p class="empty">لا توجد حسابات بعد.</p>';
+ if(L.length)$('cpf').onclick=()=>copy('IBAN,max_score,sites\n'+L.map(a=>a.iban+','+a.max+','+[...a.sites].join(' ')).join('\n'))}
+$('loaddemo').onclick=()=>{DEMO.forEach(([u,p])=>{const r=scan(u,p,'بيانات تجريبية');if(r)LOG.push(r)});renderNet();toast('حُمّلت ثلاث صفحات تجريبية')};
+
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.setAttribute('aria-selected',x===b));
+ ['scan','sms','early','net'].forEach(t=>$(t).hidden=t!==b.dataset.t);if(b.dataset.t==='net')renderNet()});
+}
+</script>
+</body>
+</html>
